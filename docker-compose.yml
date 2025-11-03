@@ -1,0 +1,31 @@
+version: '3.8'
+services:
+  mysql-master:
+    image: mysql:8.0
+    container_name: mysql-master
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+    ports:
+      - "3308:3306"
+    volumes:
+      - master-data:/var/lib/mysql
+      - ./master/my.cnf:/etc/mysql/conf.d/my.cnf
+
+  mysql-replica:
+    image: mysql:8.0
+    container_name: mysql-replica
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+    ports:
+      - "3307:3306"
+    depends_on:
+      - mysql-master
+    volumes:
+      - replica-data:/var/lib/mysql
+      - ./replica/my.cnf:/etc/mysql/conf.d/my.cnf
+
+volumes:
+  master-data:
+  replica-data:
