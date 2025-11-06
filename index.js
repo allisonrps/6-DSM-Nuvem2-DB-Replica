@@ -30,4 +30,47 @@ async function insertProduto(descricao, categoria, valor) {
   return result.insertId;
 }
 
+// Buscar produto na réplica
+async function selectProdutoById(id) {
+  const conn = await mysql.createConnection(REPLICA_DB_CONFIG);
+  const [rows] = await conn.execute(
+    'SELECT * FROM produto WHERE id = ?',
+    [id]
+  );
+  await conn.end();
+  return rows[0];
+}
 
+// Loop de inserts e selects
+async function main() {
+  let produtoCount = 1;
+
+  while (true) {
+    const descricao = `Produto-${produtoCount}`;
+    const categoria = produtoCount % 2 === 0 ? 'ELETRO' : 'MOVEIS';
+    const valor = Math.floor(Math.random() * 5000) + 100;
+
+    try {
+      // Inserir no primário
+      const insertId = await insertProduto(descricao, categoria, valor);
+      console.log(`INSERIDO no Primário: ID = ${insertId}, descricao = ${descricao}, categoria = ${categoria}, valor = ${valor}`);
+
+      // Consultar 10 IDs anteriores na réplica
+      for (let i = insertId - 1; i >= insertId - 10 && i > 0; i--) {
+        const produto = await selectProdutoById(i);
+        if (produto) {
+          console.log(`LEITURA do Replica: ID = ${produto.id}, descricao = ${produto.descricao}, categoria = ${produto.categoria}, valor=${produto.valor}`);
+        } else {
+          console.log(`LEITURA do replica: ID=${i} Não encontrado`);
+        }
+      }
+    } catch (err) {
+      console.error('Error:', err.message);
+    }
+
+    produtoCount++;
+    await new Promise(res => setTimeout(res, 1000)); // espera 1 segundo
+  }
+}
+
+main();
