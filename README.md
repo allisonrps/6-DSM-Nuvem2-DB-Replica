@@ -66,9 +66,3 @@ docker exec -it pg_slave psql -U user -d mydb -c "INSERT INTO teste (nome) VALUE
 ```
 
 O PostgreSQL deverá retornar um erro informando que a base de dados está em modo "read-only".
-
-### 📂 Estrutura de Ficheiros
-docker-compose.yml: Definição dos serviços, volumes e redes.
-config/: Arquivos de configuração personalizados do PostgreSQL (postgresql.conf, pg_hba.conf).
-scripts/: Scripts automatizados para configurar o utilizador de replicação e o backup base.
-Este projeto foi desenvolvido como parte dos estudos de Nuvem e Infraestrutura (6º Semestre de Desenvolvimento de Software Multiplataforma).
