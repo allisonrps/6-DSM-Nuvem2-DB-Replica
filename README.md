@@ -34,38 +34,38 @@ O objetivo deste repositório é fornecer uma infraestrutura automatizada para c
    ```bash
    git clone [https://github.com/allisonrps/6-DSM-Nuvem2-DB-Replica.git](https://github.com/allisonrps/6-DSM-Nuvem2-DB-Replica.git)
    cd 6-DSM-Nuvem2-DB-Replica
+   ```
    
-### Subir os containers:
+2. **Subir os containers:**
 
  ```bash
 docker-compose up -d
-Verificar se os serviços estão ativos:
 ```
 
+3. **Verificar se os serviços estão ativos:**
  ```bash
 docker-compose ps
 ```
 
 ### 🧪 Testando a Replicação
 Para validar se a replicação está a funcionar corretamente:
-
 Aceder ao container Master e criar um dado:
-
  ```bash
 docker exec -it pg_master psql -U user -d mydb -c "CREATE TABLE teste (id SERIAL PRIMARY KEY, nome VARCHAR(50));"
 docker exec -it pg_master psql -U user -d mydb -c "INSERT INTO teste (nome) VALUES ('Dados replicados');"
-Consultar o dado no container Slave:
 ```
 
+Consultar o dado no container Slave:
  ```bash
 docker exec -it pg_slave psql -U user -d mydb -c "SELECT * FROM teste;"
-Tentar escrever no Slave (Deve falhar):
 ```
 
+Tentar escrever no Slave (Deve falhar):
  ```bash
 docker exec -it pg_slave psql -U user -d mydb -c "INSERT INTO teste (nome) VALUES ('Tentativa falha');"
-O PostgreSQL deverá retornar um erro informando que a base de dados está em modo "read-only".
 ```
+
+O PostgreSQL deverá retornar um erro informando que a base de dados está em modo "read-only".
 
 ### 📂 Estrutura de Ficheiros
 docker-compose.yml: Definição dos serviços, volumes e redes.
